@@ -18,10 +18,8 @@
     restart_policy: "unless-stopped"
     recreate: "{{ ldap_management_container_recreate }}"
     pull: "{{ ldap_management_container_pull }}"
-    healthcheck:
-      test: >-
-        [ $(pgrep -u www-data -c -f /usr/sbin/apache2) -gt 0 ]
-        || exit 1
+    comparisons:
+      "*": "strict"
   when: "ldap_management_container_enabled | bool"
   tags: ["deploy", "deploy-ldap"]
 
