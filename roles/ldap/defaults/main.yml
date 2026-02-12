@@ -47,7 +47,7 @@ ldap_init_container_additional_volumes:
 # phpLDAPadmin config
 ldap_management_container_enabled: false
 ldap_management_container_name: "ldap_management"
-ldap_management_version: "0.9.0"
+ldap_management_version: "2.3.9"
 
 ldap_management_container_image_reference: >-
   {{
@@ -66,7 +66,7 @@ ldap_management_container_image_repository: >-
     + ldap_management_container_image_name
   }}
 ldap_management_container_image_registry: "docker.io"
-ldap_management_container_image_namespace: "osixia/"
+ldap_management_container_image_namespace: "phpldapadmin/"
 ldap_management_container_image_name: "phpldapadmin"
 
 ldap_management_container_ports: []
