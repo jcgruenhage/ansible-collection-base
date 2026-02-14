@@ -1,0 +1,39 @@
+[project]
+name = "ansible-collection-base"
+version = "0.2.0"
+description = "Ansible collection famedly.base"
+readme = "README.md"
+# 3.12 for controller, targets support >=3.9.0 still
+requires-python = ">=3.12.0,<3.15.0"
+
+dependencies = [
+    "ansible-core>=2.17.0,<2.21.0",
+    "filelock",
+    "GitPython",
+    "pyyaml",
+    "dataclass-wizard[yaml]",
+    "PGPy13",
+]
+
+
+# Ansible modules and lookup plugins must have DOCUMENTATION/EXAMPLES/RETURN
+# (and often ANSIBLE_METADATA) before the real imports, so imports are not
+# at the top of the file. module_utils sometimes uses late/optional imports.
+[tool.ruff.lint.per-file-ignores]
+"plugins/modules/*.py" = ["E402"]
+"plugins/lookup/*.py" = ["E402"]
+"plugins/module_utils/**/*.py" = ["E402"]
+
+[tool.ty.environment]
+# Ansible collections must live under ansible_collections/<namespace>/<name>/,
+# so ../../.. reaches the directory that contains the ansible_collections tree.
+extra-paths = ["../../.."]
+
+[dependency-groups]
+dev = [
+    "pylint>=4.0.4",
+    "pytest>=9.0.2",
+    "pytest-xdist>=3.8.0",
+    "ruff>=0.15.1",
+    "ty>=0.0.17",
+]

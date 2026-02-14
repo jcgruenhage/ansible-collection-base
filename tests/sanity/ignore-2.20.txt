@@ -1,0 +1,3 @@
+roles/lego/templates/metrics-textfile.py.j2 shebang
+plugins/lookup/openpgp_secretstore.py validate-modules:missing-gplv3-license
+plugins/modules/openpgp_secretstore.py validate-modules:missing-gplv3-license
