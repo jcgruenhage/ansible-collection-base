@@ -2,7 +2,7 @@
 - name: "No-op task for defining a yaml anchor"
   ansible.builtin.meta: "noop"
   vars: &sshd_config_args
-    path: "{{ ssh_config_file }}"
+    path: "{{ sshd_config_file }}"
     state: "present"
     validate: "sshd -Tf %s"
   tags: ["prepare", "prepare-sshd"]
@@ -125,17 +125,17 @@
       - KexAlgorithms
   changed_when: false
   check_mode: false
-  when: "ssh_preset.allowed_kexalgos is defined"
-  register: queried_kex_algorithms
+  when: "sshd_preset.allowed_kexalgos is defined"
+  register: sshd_queried_kex_algorithms
   tags: ["prepare", "prepare-sshd"]
 
 - name: "Only allow reasonably secure KexAlgorithms"
   ansible.builtin.lineinfile:
     <<: *sshd_config_args
     regexp: "^#?KexAlgorithms"
-    line: "KexAlgorithms {{ ssh_preset.allowed_kexalgos | famedly.base.intersect(queried_kex_algorithms.stdout_lines) | join(',') }}"
+    line: "KexAlgorithms {{ sshd_preset.allowed_kexalgos | famedly.base.intersect(sshd_queried_kex_algorithms.stdout_lines) | join(',') }}"
     insertafter: *cipher_after
-  when: "ssh_preset.allowed_kexalgos is defined"
+  when: "sshd_preset.allowed_kexalgos is defined"
   notify: "reload sshd"
   tags: ["prepare", "prepare-sshd"]
 
@@ -147,17 +147,17 @@
       - Ciphers
   changed_when: false
   check_mode: false
-  when: "ssh_preset.allowed_ciphers is defined"
-  register: queried_ciphers
+  when: "sshd_preset.allowed_ciphers is defined"
+  register: sshd_queried_ciphers
   tags: ["prepare", "prepare-sshd"]
 
 - name: "Only allow reasonably secure Ciphers"
   ansible.builtin.lineinfile:
     <<: *sshd_config_args
     regexp: "^#?Ciphers"
-    line: "Ciphers {{ ssh_preset.allowed_ciphers | famedly.base.intersect(queried_ciphers.stdout_lines) | join(',') }}"
+    line: "Ciphers {{ sshd_preset.allowed_ciphers | famedly.base.intersect(sshd_queried_ciphers.stdout_lines) | join(',') }}"
     insertafter: *cipher_after
-  when: "ssh_preset.allowed_ciphers is defined"
+  when: "sshd_preset.allowed_ciphers is defined"
   notify: "reload sshd"
   tags: ["prepare", "prepare-sshd"]
 
@@ -169,17 +169,17 @@
       - MACs
   changed_when: false
   check_mode: false
-  when: "ssh_preset.allowed_macs is defined"
-  register: queried_macs
+  when: "sshd_preset.allowed_macs is defined"
+  register: sshd_queried_macs
   tags: ["prepare", "prepare-sshd"]
 
 - name: "Only allow reasonably secure MACs"
   ansible.builtin.lineinfile:
     <<: *sshd_config_args
     regexp: "^#?MACs"
-    line: "MACs {{ ssh_preset.allowed_macs | famedly.base.intersect(queried_macs.stdout_lines) | join(',') }}"
+    line: "MACs {{ sshd_preset.allowed_macs | famedly.base.intersect(sshd_queried_macs.stdout_lines) | join(',') }}"
     insertafter: *cipher_after
-  when: "ssh_preset.allowed_macs is defined"
+  when: "sshd_preset.allowed_macs is defined"
   notify: "reload sshd"
   tags: ["prepare", "prepare-sshd"]
 
@@ -191,17 +191,17 @@
       - HostKeyAlgorithms
   changed_when: false
   check_mode: false
-  when: "ssh_preset.allowed_hostkey_algos is defined"
-  register: queried_hostkey_algos
+  when: "sshd_preset.allowed_hostkey_algos is defined"
+  register: sshd_queried_hostkey_algos
   tags: ["prepare", "prepare-sshd"]
 
 - name: "Only allow reasonably secure HostKeyAlgorithms"
   ansible.builtin.lineinfile:
     <<: *sshd_config_args
     regexp: "^#?HostKeyAlgorithms"
-    line: "HostKeyAlgorithms {{ ssh_preset.allowed_hostkey_algos | famedly.base.intersect(queried_hostkey_algos.stdout_lines) | join(',') }}"
+    line: "HostKeyAlgorithms {{ sshd_preset.allowed_hostkey_algos | famedly.base.intersect(sshd_queried_hostkey_algos.stdout_lines) | join(',') }}"
     insertafter: *cipher_after
-  when: "ssh_preset.allowed_hostkey_algos is defined"
+  when: "sshd_preset.allowed_hostkey_algos is defined"
   notify: "reload sshd"
   tags: ["prepare", "prepare-sshd"]
 
@@ -213,32 +213,32 @@
       - PubkeyAcceptedKeyTypes
   changed_when: false
   check_mode: false
-  when: "ssh_preset.allowed_pubkey_algos is defined"
-  register: queried_pubkey_algos
+  when: "sshd_preset.allowed_pubkey_algos is defined"
+  register: sshd_queried_pubkey_algos
   tags: ["prepare", "prepare-sshd"]
 
 - name: "Only allow reasonably secure PubkeyAcceptedKeyTypes"
   ansible.builtin.lineinfile:
     <<: *sshd_config_args
     regexp: "^#?PubkeyAcceptedKeyTypes"
-    line: "PubkeyAcceptedKeyTypes {{ ssh_preset.allowed_pubkey_algos | famedly.base.intersect(queried_pubkey_algos.stdout_lines) | join(',') }}"
+    line: "PubkeyAcceptedKeyTypes {{ sshd_preset.allowed_pubkey_algos | famedly.base.intersect(sshd_queried_pubkey_algos.stdout_lines) | join(',') }}"
     insertafter: *cipher_after
-  when: "ssh_preset.allowed_pubkey_algos is defined"
+  when: "sshd_preset.allowed_pubkey_algos is defined"
   notify: "reload sshd"
   tags: ["prepare", "prepare-sshd"]
 
-- name: "Set LogLevel to {{ ssh_loglevel }}"
+- name: "Set LogLevel to {{ sshd_loglevel }}"
   ansible.builtin.lineinfile:
     <<: *sshd_config_args
     regexp: "^#?LogLevel"
-    line: "LogLevel {{ ssh_loglevel }}"
+    line: "LogLevel {{ sshd_loglevel }}"
   notify: "reload sshd"
   tags: ["prepare", "prepare-sshd"]
 
-- name: "Listen on address family {{ ssh_address_family }}"
+- name: "Listen on address family {{ sshd_address_family }}"
   ansible.builtin.lineinfile:
     <<: *sshd_config_args
     regexp: "^#?AddressFamily"
-    line: "AddressFamily {{ ssh_address_family }}"
+    line: "AddressFamily {{ sshd_address_family }}"
   notify: "reload sshd"
   tags: ["prepare", "prepare-sshd"]

@@ -20,5 +20,6 @@
       - --system
       - restart
       - sshd
+  changed_when: true
   when: ansible_facts['os_family'] in ["Chimera"]
   listen: "reload sshd"

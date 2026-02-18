@@ -1,5 +1,5 @@
 ---
-ssh_secure_presets:
+sshd_secure_presets:
   allowed_kexalgos:
     - sntrup761x25519-sha512@openssh.com
     - sntrup4591761x25519-sha512@tinyssh.org
@@ -47,7 +47,7 @@ ssh_secure_presets:
     - rsa-sha2-512
     - rsa-sha2-256
 
-ssh_bsi_recommended_presets:
+sshd_bsi_recommended_presets:
   # TR-02102-4, Version 2023-01, Section 3.3
   allowed_kexalgos:
     - ecdh-sha2-nistp521
@@ -75,4 +75,4 @@ ssh_bsi_recommended_presets:
   # of recommended algorithms here, but points to TR-03116-4, which isn't
   # applicable unless it's a gov project. We're threrefore falling back to our
   # secure preset from above.
-  allowed_pubkey_algos: "{{ ssh_secure_presets.allowed_pubkey_algos }}"
+  allowed_pubkey_algos: "{{ sshd_secure_presets.allowed_pubkey_algos }}"
