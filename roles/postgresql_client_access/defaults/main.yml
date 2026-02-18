@@ -1,8 +1,8 @@
 ---
-postgresql_base_path: "/opt/postgresql"
-postgresql_socket_path: "{{ postgresql_base_path }}/sockets"
-postgresql_config_path: "{{ postgresql_base_path }}/config"
-postgresql_connect_socket: true
+postgresql_client_access_base_path: "/opt/postgresql"
+postgresql_client_access_socket_path: "{{ postgresql_client_access_base_path }}/sockets"
+postgresql_client_access_config_path: "{{ postgresql_client_access_base_path }}/config"
+postgresql_client_access_connect_socket: true
 
-postgresql_container_name: "postgresql"
+postgresql_client_access_container_name: "postgresql"
 postgresql_client_access_state: "present"

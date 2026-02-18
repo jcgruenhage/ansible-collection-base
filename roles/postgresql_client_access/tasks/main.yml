@@ -1,8 +1,8 @@
 ---
 - name: "Get PostgreSQL container info"
   community.docker.docker_container_info:
-    name: "{{ postgresql_container_name }}"
-  register: "postgresql_container"
+    name: "{{ postgresql_client_access_container_name }}"
+  register: "postgresql_client_access_container"
   tags: ["deploy", "deploy-postgresql-client-access"]
 
 - name: "Ensure users are present"
@@ -10,9 +10,9 @@
     name: "{{ item.name }}"
     password: "{{ item.password }}"
     state: "present"
-    login_host: "{{ postgresql_connection.login_host }}"
-    login_port: "{{ postgresql_connection.login_port }}"
-    login_password: "{{ postgresql_connection.login_password | default(omit) }}"
+    login_host: "{{ postgresql_client_access_connection.login_host }}"
+    login_port: "{{ postgresql_client_access_connection.login_port }}"
+    login_password: "{{ postgresql_client_access_connection.login_password | default(omit) }}"
   loop: "{{ postgresql_client_access_users }}"
   loop_control:
     label: "{{ item.name }}"
@@ -29,9 +29,9 @@
     lc_ctype: "{{ item.lc_ctype | default('C') }}"
     template: "{{ item.template | default('template0') }}"
     state: "present"
-    login_host: "{{ postgresql_connection.login_host }}"
-    login_port: "{{ postgresql_connection.login_port }}"
-    login_password: "{{ postgresql_connection.login_password | default(omit) }}"
+    login_host: "{{ postgresql_client_access_connection.login_host }}"
+    login_port: "{{ postgresql_client_access_connection.login_port }}"
+    login_password: "{{ postgresql_client_access_connection.login_password | default(omit) }}"
   loop: "{{ postgresql_client_access_databases }}"
   loop_control:
     label: "{{ item.name }}"
@@ -42,7 +42,7 @@
 
 - name: "Ensure pg_hba.conf is up to date"
   community.postgresql.postgresql_pg_hba:
-    dest: "{{ postgresql_config_path }}/pg_hba.conf"
+    dest: "{{ postgresql_client_access_config_path }}/pg_hba.conf"
     contype: "{{ item.contype }}"
     databases: "{{ item.databases | default(omit) }}"
     users: "{{ item.users | default(omit) }}"
@@ -61,9 +61,9 @@
   community.postgresql.postgresql_db:
     name: "{{ item.name }}"
     state: "absent"
-    login_host: "{{ postgresql_connection.login_host }}"
-    login_port: "{{ postgresql_connection.login_port }}"
-    login_password: "{{ postgresql_connection.login_password | default(omit) }}"
+    login_host: "{{ postgresql_client_access_connection.login_host }}"
+    login_port: "{{ postgresql_client_access_connection.login_port }}"
+    login_password: "{{ postgresql_client_access_connection.login_password | default(omit) }}"
   loop: "{{ postgresql_client_access_databases }}"
   loop_control:
     label: "{{ item.name }}"
@@ -76,9 +76,9 @@
   community.postgresql.postgresql_user:
     name: "{{ item.name }}"
     state: "absent"
-    login_host: "{{ postgresql_connection.login_host }}"
-    login_port: "{{ postgresql_connection.login_port }}"
-    login_password: "{{ postgresql_connection.login_password | default(omit) }}"
+    login_host: "{{ postgresql_client_access_connection.login_host }}"
+    login_port: "{{ postgresql_client_access_connection.login_port }}"
+    login_password: "{{ postgresql_client_access_connection.login_password | default(omit) }}"
   loop: "{{ postgresql_client_access_users }}"
   loop_control:
     label: "{{ item.name }}"

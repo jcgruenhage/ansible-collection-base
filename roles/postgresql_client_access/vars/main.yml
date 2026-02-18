@@ -1,11 +1,11 @@
 ---
-postgresql_connection:
+postgresql_client_access_connection:
   login_host: >-
     {{
-      postgresql_socket_path
-      if postgresql_connect_socket
+      postgresql_client_access_socket_path
+      if postgresql_client_access_connect_socket
       else (
-        postgresql_container.container.NetworkSettings.IPAddress
+        postgresql_client_access_container.container.NetworkSettings.IPAddress
         if postgresql_host_port is undefined
         else "127.0.0.1"
       )
@@ -13,7 +13,7 @@ postgresql_connection:
   login_port: >-
     {{
       postgresql_host_port
-      if postgresql_host_port is defined and not postgresql_connect_socket
+      if postgresql_host_port is defined and not postgresql_client_access_connect_socket
       else "5432"
     }}
   login_password: "{{ postgresql_superuser_password }}"
