@@ -1,2 +1,2 @@
 ---
-dropbear_options: "{{ dropbear_default_options + dropbear_extra_options | default([]) }}"
+dropbear_luks_unlock_options: "{{ dropbear_luks_unlock_default_options + dropbear_luks_unlock_extra_options | default([]) }}"
