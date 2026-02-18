@@ -10,7 +10,7 @@
   when: lego_install_dependencies | bool and ansible_facts['pkg_mgr'] == 'apt'
 
 - name: "Ensure lego user is created"
-  user:
+  ansible.builtin.user:
     name: "{{ lego_user }}"
     state: "present"
     system: true
@@ -18,7 +18,7 @@
   tags: ["prepare", "prepare-lego"]
 
 - name: "Ensure base directory for lego is created"
-  file:
+  ansible.builtin.file:
     path: "{{ lego_base_path }}"
     state: "directory"
     owner: "{{ lego_certificate_store_user }}"
@@ -36,7 +36,7 @@
   tags: ["prepare", "prepare-lego"]
   register: lego_certificate_store_info
 
-- name: "Ensure certificates in directory belong to '{{ lego_certificate_store_user }}:{{ lego_certificate_store_group }}'"
+- name: "Ensure certificate directory ownership for lego"  # noqa: no-handler
   ansible.builtin.file:
     path: "{{ lego_certificate_store }}"
     state: directory
@@ -47,7 +47,7 @@
   when: lego_certificate_store_info.changed
 
 - name: "Ensure lego binary exists and has the correct version"
-  shell: "{{ lego_check_version_cmd }}"  # noqa: command-instead-of-shell
+  ansible.builtin.shell: "{{ lego_check_version_cmd }}"  # noqa: command-instead-of-shell
   check_mode: false
   changed_when: false
   ignore_errors: true
@@ -55,7 +55,7 @@
   tags: ["prepare", "prepare-lego"]
 
 - name: "Ensure lego metrics textfile generator exists"
-  template:
+  ansible.builtin.template:
     src: "metrics-textfile.py.j2"
     dest: "{{ lego_base_path }}/metrics-textfile.py"
     owner: "root"
@@ -68,7 +68,7 @@
   when: "lego_version_res.failed or not lego_version in lego_version_res.stdout"
   block:
     - name: "Download source file"
-      get_url:
+      ansible.builtin.get_url:
         url: "{{ lego_source_url }}"
         dest: "{{ lego_base_path }}/source.tar"
         checksum: "{{ lego_source_checksum_url }}"
@@ -79,7 +79,7 @@
       tags: ["prepare", "prepare-lego"]
 
     - name: "Unpack source files"
-      unarchive:
+      ansible.builtin.unarchive:
         src: "{{ lego_base_path }}/source.tar"
         dest: "{{ lego_base_path }}"
         owner: "{{ lego_user_res.uid }}"
@@ -97,7 +97,7 @@
       tags: ["prepare", "prepare-lego"]
 
     - name: "Delete source files"
-      file:
+      ansible.builtin.file:
         path: "{{ lego_base_path }}/source.tar"
         state: "absent"
       tags: ["prepare", "prepare-lego"]
@@ -106,7 +106,7 @@
   when: "lego_acme_account is defined and lego_acme_privkey is defined"
   block:
     - name: "Create account directory"
-      file:
+      ansible.builtin.file:
         path: "{{ lego_acme_account_base_path }}"
         state: "directory"
         mode: "0755"
@@ -115,7 +115,7 @@
       tags: ["prepare", "prepare-lego"]
 
     - name: "Create key directory"
-      file:
+      ansible.builtin.file:
         path: "{{ lego_acme_key_base_path }}"
         state: "directory"
         mode: "0755"
@@ -124,7 +124,7 @@
       tags: ["prepare", "prepare-lego"]
 
     - name: "Save acme account"
-      copy:
+      ansible.builtin.copy:
         dest: "{{ lego_acme_account_path }}"
         content: "{{ lego_acme_account_merged | to_json }}"
         mode: "0600"
@@ -133,7 +133,7 @@
       tags: ["deploy", "deploy-lego"]
 
     - name: "Save acme private key"
-      copy:
+      ansible.builtin.copy:
         dest: "{{ lego_acme_key_path }}"
         content: "{{ lego_acme_privkey }}"
         mode: "0600"
@@ -202,7 +202,7 @@
   tags: ["deploy", "deploy-lego"]
 
 - name: "Ensure systemd unit file for lego is templated"
-  template:
+  ansible.builtin.template:
     src: "lego.service.j2"
     dest: "{{ lego_systemd_path }}/lego.service"
     owner: "root"
@@ -212,7 +212,7 @@
   tags: ["deploy", "deploy-lego"]
 
 - name: "Ensure systemd timer for lego is templated"
-  template:
+  ansible.builtin.template:
     src: "lego.timer.j2"
     dest: "{{ lego_systemd_path }}/lego.timer"
     owner: "root"
@@ -222,16 +222,16 @@
   tags: ["deploy", "deploy-lego"]
 
 - name: "Flush handlers to ensure systemd has loaded the unit files"
-  meta: "flush_handlers"
+  ansible.builtin.meta: "flush_handlers"
 
 - name: "Enable lego.service"
-  systemd:
+  ansible.builtin.systemd:
     name: "lego.service"
     enabled: true
   tags: ["deploy", "deploy-lego"]
 
 - name: "Enable lego.timer"
-  systemd:
+  ansible.builtin.systemd:
     name: "lego.timer"
     state: "started"
     enabled: true
