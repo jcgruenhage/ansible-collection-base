@@ -12,6 +12,10 @@ authors:
   - "Lukas Lihotzki <l.lihotzki@famedly.com>"
   - "Vincent Wilke"
 description: "Common functionality needed on hosts to build complex services on."
+tags:
+  - infrastructure
+  - tools
+  - linux
 dependencies:
   "sivel.toiletwater": ">=0.0.15"
 license: ["AGPL-3.0-only"]
