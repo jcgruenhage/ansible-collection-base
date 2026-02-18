@@ -1,6 +1,6 @@
 ---
 - name: "Create system user to run postgresql as"
-  user:
+  ansible.builtin.user:
     name: "{{ postgresql_user }}"
     state: "present"
     system: true
@@ -10,14 +10,14 @@
 - name: "Check if postgresql_data_path exists"
   ansible.builtin.stat:
     path: "{{ postgresql_data_path }}"
-  register: "stat_postgresql_data_path"
+  register: "postgresql_stat_data_path"
   tags: ["prepare", "prepare-postgresql"]
 
 - name: "Check if PG_VERSION file exists"
   ansible.builtin.stat:
     path: "{{ postgresql_data_path }}/PG_VERSION"
-  when: "stat_postgresql_data_path.stat.exists"
-  register: "stat_postgresql_pg_version"
+  when: "postgresql_stat_data_path.stat.exists"
+  register: "postgresql_stat_pg_version"
   tags: ["prepare", "prepare-postgresql"]
 
 - name: "Read PG_VERSION file and set postgresql_existing_database_version"
@@ -25,8 +25,8 @@
     path: "{{ postgresql_data_path }}/PG_VERSION"
   register: "postgresql_existing_database_version"
   when:
-    - "stat_postgresql_data_path.stat.exists"
-    - "stat_postgresql_pg_version.stat.exists"
+    - "postgresql_stat_data_path.stat.exists"
+    - "postgresql_stat_pg_version.stat.exists"
   tags: ["prepare", "prepare-postgresql"]
 
 - name: "Prevent major version update, use version of existing database instead"
@@ -39,7 +39,7 @@
     - "(postgresql_container_version | split('.') | first) != (existing_version)"
   tags: ["prepare", "prepare-postgresql"]
 
-- name: "Ensure image {{ postgresql_container_image_reference }} is pulled"
+- name: "Ensure PostgreSQL container image is pulled"
   community.docker.docker_image:
     name: "{{ postgresql_container_image_reference }}"
     force_source: "{{ postgresql_container_pull }}"
@@ -64,8 +64,8 @@
   tags: ["prepare", "prepare-postgresql"]
 
 - name: "Initialize"
-  include_tasks: "initialize.yml"
-  when: (not stat_postgresql_data_path.stat.exists) or (not stat_postgresql_pg_version.stat.exists)
+  ansible.builtin.include_tasks: "initialize.yml"
+  when: (not postgresql_stat_data_path.stat.exists) or (not postgresql_stat_pg_version.stat.exists)
   tags: ["prepare", "prepare-postgresql"]
 
 - name: "Template fake /etc/passwd for postgres"
@@ -138,13 +138,13 @@
   tags: ["deploy", "deploy-postgresql"]
 
 - name: "Wait for container startup"
-  wait_for:
+  ansible.builtin.wait_for:
     path: "{{ postgresql_socket_path }}/.s.PGSQL.5432"
   when: "postgresql_connect_socket"
   tags: ["deploy", "deploy-postgresql"]
 
 - name: "Wait for container startup"
-  wait_for:
+  ansible.builtin.wait_for:
     port: "{{ postgresql_host_port }}"
   when: "not postgresql_connect_socket"
   tags: ["deploy", "deploy-postgresql"]
@@ -184,7 +184,7 @@
 # The above task sets global options, but only some of them require a restart
 # The below task notifies the restart handler only in these cases, preventing unnecessary downtime
 - name: "Check and notify handler if restart is required"
-  debug:
+  ansible.builtin.debug:
     msg: "{{ item.item.option }} changed. Restart required: {{ item.restart_required }}"
   when: "item.changed"  # noqa no-handler
   changed_when: "item.restart_required"
