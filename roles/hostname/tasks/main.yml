@@ -1,6 +1,6 @@
 ---
 - name: "Set /etc/hostname to FQDN of the server"
-  copy:
+  ansible.builtin.copy:
     dest: "/etc/hostname"
     owner: "root"
     group: "root"
@@ -11,7 +11,7 @@
   notify: "set-hostname"
 
 - name: "Ensure /etc/hosts contains all hostnames and aliases of the server"
-  blockinfile:
+  ansible.builtin.blockinfile:
     dest: "/etc/hosts"
     owner: "root"
     group: "root"
