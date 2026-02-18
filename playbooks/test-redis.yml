@@ -1,5 +1,6 @@
 ---
-- hosts: ["localhost"]
+- name: "Test Redis"
+  hosts: ["localhost"]
   become: true
   roles:
     - role: "redis"

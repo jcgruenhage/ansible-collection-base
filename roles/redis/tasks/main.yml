@@ -1,6 +1,6 @@
 ---
 - name: "Create redis user"
-  user:
+  ansible.builtin.user:
     name: "{{ redis_user }}"
     create_home: false
     state: "present"
@@ -8,7 +8,7 @@
   tags: ["prepare", "prepare-redis", "deploy", "deploy-redis"]
 
 - name: "Create redis directory"
-  file:
+  ansible.builtin.file:
     path: "{{ redis_basepath }}"
     state: "directory"
     owner: "{{ redis_user }}"
@@ -17,7 +17,7 @@
   tags: ["prepare", "prepare-redis"]
 
 - name: "Create redis directory for data persistance"
-  file:
+  ansible.builtin.file:
     path: "{{ redis_data_dir }}"
     state: "directory"
     owner: "{{ redis_user }}"
@@ -26,7 +26,7 @@
   tags: ["prepare", "prepare-redis"]
 
 - name: "Create redis config directory"
-  file:
+  ansible.builtin.file:
     path: "{{ redis_config_dir }}"
     state: "directory"
     owner: "{{ redis_user }}"
@@ -35,7 +35,7 @@
   tags: ["prepare", "prepare-redis"]
 
 - name: "Template redis config file"
-  template:
+  ansible.builtin.template:
     src: "redis.conf.j2"
     dest: "{{ redis_config_file }}"
     owner: "{{ redis_user }}"
@@ -70,4 +70,4 @@
   tags: ["deploy", "deploy-redis"]
 
 - name: "Ensure redis is restarted if config changed"
-  meta: "flush_handlers"
+  ansible.builtin.meta: "flush_handlers"
