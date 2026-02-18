@@ -14,7 +14,7 @@ lego_challenge_tls_mergeable:
   command_parameters:
     global:
       tls:
-  
+
 lego_configuration_merged: >-2
   {{
     {} | ansible.builtin.combine(
