@@ -1,11 +1,13 @@
 - name: "Set hostname via hostnamectl to avoid a reboot"
-  command:
+  ansible.builtin.command:
     cmd: "hostnamectl set-hostname {{ hostname_fqdn }}"
+  changed_when: true
   when: ansible_os_family in ["Debian"]
   listen: "set-hostname"
 
 - name: "Set hostname via hostname to avoid a reboot"
-  command:
+  ansible.builtin.command:
     cmd: "hostname {{ hostname_fqdn }}"
+  changed_when: true
   when: ansible_os_family in ["Chimera"]
   listen: "set-hostname"
