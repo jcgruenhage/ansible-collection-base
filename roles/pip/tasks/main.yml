@@ -1,11 +1,11 @@
 ---
 - name: "Ensure Pip is installed."
-  package:
+  ansible.builtin.package:
     name: "{{ pip_package_name }}"
     state: "present"
 
 - name: "Install packages from list"
-  pip:
+  ansible.builtin.pip:
     name: "{{ item.name | default(item) }}"
     version: "{{ item.version | default(omit) }}"
     virtualenv: "{{ item.virtualenv | default(omit) }}"
@@ -16,7 +16,7 @@
   environment: "{{ pip_environment_variables }}"
 
 - name: "Install packages from requirements file"
-  pip:
+  ansible.builtin.pip:
     requirements: "{{ pip_requirements_file }}"
     virtualenv: "{{ pip_package_virtualenv | default(omit) }}"
     state: "{{ pip_package_state | default(omit) }}"
