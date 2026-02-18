@@ -1,13 +1,13 @@
 ---
 - name: "Ensure base path exists"
-  file:
+  ansible.builtin.file:
     path: "{{ ldap_base_path }}"
     state: "directory"
     mode: "0755"
   tags: ["prepare", "prepare-ldap"]
 
 - name: "Create volume paths"
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: "directory"
     mode: "0755"
@@ -18,7 +18,7 @@
   tags: ["prepare", "prepare-ldap"]
 
 - name: "Provide intial container configuration"
-  import_tasks: "initialize.yml"
+  ansible.builtin.import_tasks: "initialize.yml"
 
 - name: "Ensure LDAP container image is pulled"
   community.docker.docker_image:
@@ -52,7 +52,7 @@
   tags: ["deploy", "deploy-ldap"]
 
 - name: "Configure LDAP DIT"
-  import_tasks: "configure.yml"
+  ansible.builtin.import_tasks: "configure.yml"
 
 - name: "Set up phpLDAPAdmin container"
-  import_tasks: "ldap-web-ui.yml"
+  ansible.builtin.import_tasks: "ldap-web-ui.yml"
