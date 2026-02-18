@@ -17,7 +17,7 @@ to build services on.
 - [`roles/rclone_serve`](roles/rclone_serve/README.md) to deploy rclone serve in a docker container
 - [`roles/redis`](roles/redis/README.md) to deploy redis in a docker container
 - [`roles/restic`](roles/restic/README.md) to configure backups using restic controlled by systemd
-- [`roles/ssh`](roles/ssh/README.md) for SSH hardening
+- [`roles/sshd`](roles/sshd/README.md) for SSH hardening
 - [`roles/user`](roles/user/README.md) for creating user accounts with SSH keys deployed
 
 ## Plugins
