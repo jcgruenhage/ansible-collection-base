@@ -1,4 +1,4 @@
-# `famedly.base.ssh` ansible role for SSH hardening
+# `famedly.base.sshd` ansible role for SSH hardening
 
 This role is used for basic hardening of a SSH daemon. It features
 common basic hardening features like disabling root login, requiring

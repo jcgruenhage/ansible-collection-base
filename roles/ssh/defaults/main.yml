@@ -5,12 +5,12 @@ ssh_preset: "{{ ssh_secure_presets }}"
 ssh_loglevel: "VERBOSE"
 ssh_address_family: "any"
 
-sshd_config_password_authentication: false
-sshd_config_challenge_response_authentication: false
-sshd_config_pubkey_authentication: true
-sshd_config_root_login: false
-sshd_config_client_alive_interval: 300
-sshd_config_protocol: 2
-sshd_config_x11_forwarding: false
-sshd_config_allow_agent_forwarding: false
-sshd_config_allow_tcp_forwarding: false
+ssh_password_authentication: false
+ssh_challenge_response_authentication: false
+ssh_pubkey_authentication: true
+ssh_root_login: false
+ssh_client_alive_interval: 300
+ssh_protocol: 2
+ssh_x11_forwarding: false
+ssh_allow_agent_forwarding: false
+ssh_allow_tcp_forwarding: false

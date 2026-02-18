@@ -1,0 +1,15 @@
+sshd_config_file: "/etc/ssh/sshd_config"
+
+sshd_preset: "{{ sshd_secure_presets }}"
+sshd_loglevel: "VERBOSE"
+sshd_address_family: "any"
+
+sshd_config_password_authentication: false
+sshd_config_challenge_response_authentication: false
+sshd_config_pubkey_authentication: true
+sshd_config_root_login: false
+sshd_config_client_alive_interval: 300
+sshd_config_protocol: 2
+sshd_config_x11_forwarding: false
+sshd_config_allow_agent_forwarding: false
+sshd_config_allow_tcp_forwarding: false
