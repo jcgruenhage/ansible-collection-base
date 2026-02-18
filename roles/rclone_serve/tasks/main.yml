@@ -1,4 +1,4 @@
 ---
 
 - name: Include tasks for {{ rclone_serve_role_action }}
-  include_tasks: "{{ rclone_serve_role_action }}.yml"
+  ansible.builtin.include_tasks: "{{ rclone_serve_role_action }}.yml"
