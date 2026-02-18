@@ -10,7 +10,7 @@ See `defaults/main.yml`.
 
 The `postgresql_superuser_password` variable must contain the password for the default user `postgres` if the authentication method in `pg_hba.conf` is not `trust`.
 
-When `postgresql_connect_socket` is set to `true`, the role tries to connect to the server via UNIX socket specified in `postgresql_socket_path`.
+When `postgresql_client_access_connect_socket` is set to `true`, the role tries to connect to the server via UNIX socket specified in `postgresql_client_access_socket_path`.
 If it is set to `false`, the connection will be established via TCP socket. If `postgresql_host_port` is set, it will try to connect to this port on `127.0.0.1`, otherwise it will try to find out the container's IP and connect to it on the standard port `5432`.
 
 ### `postgresql_client_access_users` list
@@ -79,7 +79,7 @@ Docker needs to be installed and configured.
         method: trust
     postgresql_host_port: "2345"
     postgresql_superuser_password: "{{ vault_postgresql_superuser_password }}"
-    postgresql_connect_socket: "false"
+    postgresql_client_access_connect_socket: "false"
 ```
 
 ## License
