@@ -1,5 +1,6 @@
 ---
 - name: "Rebuild the initial ram fs containing the dropbear shell and luks tools"
-  command:
+  ansible.builtin.command:
     cmd: "update-initramfs -u -v"
+  changed_when: true
   listen: "rebuild-initramfs"

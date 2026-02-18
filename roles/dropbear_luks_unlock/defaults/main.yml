@@ -1,10 +1,10 @@
 ---
-dropbear_luks_required_packages:
+dropbear_luks_unlock_required_packages:
   - "dropbear-initramfs"
   - "cryptsetup-initramfs"
 
-dropbear_crypttab_path: "/etc/crypttab"
-dropbear_initramfs_base_paths:
+dropbear_luks_unlock_crypttab_path: "/etc/crypttab"
+dropbear_luks_unlock_initramfs_base_paths:
   Debian:
     "10":
       base_path: "/etc/dropbear-initramfs"
@@ -16,30 +16,30 @@ dropbear_initramfs_base_paths:
     base_path: "/etc/dropbear/initramfs"
     config_file: "dropbear.conf"
 
-dropbear_initramfs_base_path: "{{ (dropbear_initramfs_base_paths[ansible_distribution][ansible_distribution_major_version | string]
-                                   | default(dropbear_initramfs_base_paths.default)).base_path }}"
+dropbear_luks_unlock_initramfs_base_path: "{{ (dropbear_luks_unlock_initramfs_base_paths[ansible_distribution][ansible_distribution_major_version | string]
+                                   | default(dropbear_luks_unlock_initramfs_base_paths.default)).base_path }}"
 
-dropbear_initramfs_config_file: "{{ (dropbear_initramfs_base_paths[ansible_distribution][ansible_distribution_major_version | string]
-                                     | default(dropbear_initramfs_base_paths.default)).config_file }}"
-dropbear_initramfs_config_path: "{{ dropbear_initramfs_base_path }}/{{ dropbear_initramfs_config_file }}"
-dropbear_initramfs_authorized_keys_path: "{{ dropbear_initramfs_base_path }}/authorized_keys"
-initramfs_tools_config_path: "/etc/initramfs-tools/initramfs.conf"
-initramfs_tools_module_config_path: "/etc/initramfs-tools/modules"
-initramfs_modules_to_load:
+dropbear_luks_unlock_initramfs_config_file: "{{ (dropbear_luks_unlock_initramfs_base_paths[ansible_distribution][ansible_distribution_major_version | string]
+                                     | default(dropbear_luks_unlock_initramfs_base_paths.default)).config_file }}"
+dropbear_luks_unlock_initramfs_config_path: "{{ dropbear_luks_unlock_initramfs_base_path }}/{{ dropbear_luks_unlock_initramfs_config_file }}"
+dropbear_luks_unlock_initramfs_authorized_keys_path: "{{ dropbear_luks_unlock_initramfs_base_path }}/authorized_keys"
+dropbear_luks_unlock_initramfs_tools_config_path: "/etc/initramfs-tools/initramfs.conf"
+dropbear_luks_unlock_initramfs_tools_module_config_path: "/etc/initramfs-tools/modules"
+dropbear_luks_unlock_initramfs_modules_to_load:
   - "virtio"
   - "virtio_pci"
   - "virtio_net"
 
-dropbear_default_options:
+dropbear_luks_unlock_default_options:
   - "-I 300"  # timeout of 300 seconds
   - "-j"  # no local port forwarding
   - "-k"  # no remote port forwarding
-  - "-p {{ dropbear_listen_port }}"  # listen on `dropbear_listen_port`
+  - "-p {{ dropbear_luks_unlock_listen_port }}"  # listen on `dropbear_luks_unlock_listen_port`
   - "-s"  # no password login
-  - "-c {{ dropbear_run_command }}"  # run `dropbear_run_command` on login
-dropbear_run_command: "/bin/cryptroot-unlock"
+  - "-c {{ dropbear_luks_unlock_run_command }}"  # run `dropbear_luks_unlock_run_command` on login
+dropbear_luks_unlock_run_command: "/bin/cryptroot-unlock"
 
-dropbear_ip_config: ~
-dropbear_listen_port: 22
+dropbear_luks_unlock_ip_config: ~
+dropbear_luks_unlock_listen_port: 22
 
-dropbear_authorized_keys: []
+dropbear_luks_unlock_authorized_keys: []

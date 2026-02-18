@@ -1,75 +1,75 @@
 ---
 - name: "Install required packages"
-  apt:
+  ansible.builtin.apt:
     state: "present"
-    pkg: "{{ dropbear_luks_required_packages }}"
+    pkg: "{{ dropbear_luks_unlock_required_packages }}"
 
 - name: "Configure `crypttab`"
-  lineinfile:
-    path: "{{ dropbear_crypttab_path }}"
+  ansible.builtin.lineinfile:
+    path: "{{ dropbear_luks_unlock_crypttab_path }}"
     regex: "^(.*) (luks,discard)$"
     line: "\\1 luks,initramfs"
     state: "present"
     backrefs: true
 
 - name: "Configure SSH options for dropbear"
-  lineinfile:
-    path: "{{ dropbear_initramfs_config_path }}"
-    line: "DROPBEAR_OPTIONS=\"{{ dropbear_options | join(' ') }}\""
+  ansible.builtin.lineinfile:
+    path: "{{ dropbear_luks_unlock_initramfs_config_path }}"
+    line: "DROPBEAR_OPTIONS=\"{{ dropbear_luks_unlock_options | join(' ') }}\""
     regex: "^#?DROPBEAR_OPTIONS="
   notify: "rebuild-initramfs"
 
 - name: "Configure initramfs-tools to use busybox"
-  lineinfile:
-    path: "{{ initramfs_tools_config_path }}"
+  ansible.builtin.lineinfile:
+    path: "{{ dropbear_luks_unlock_initramfs_tools_config_path }}"
     line: "BUSYBOX=y"
     regex: "^#?BUSYBOX="
   notify: "rebuild-initramfs"
 
 - name: "Set interface where dropbear is supposed to listen"
-  lineinfile:
-    path: "{{ initramfs_tools_config_path }}"
-    line: "DEVICE={{ dropbear_ip_config.interface }}"
+  ansible.builtin.lineinfile:
+    path: "{{ dropbear_luks_unlock_initramfs_tools_config_path }}"
+    line: "DEVICE={{ dropbear_luks_unlock_ip_config.interface }}"
     regex: "^#?DEVICE="
   notify: "rebuild-initramfs"
 
 - name: "Configure IP on which dropbear should listen"
-  lineinfile:
-    path: "{{ initramfs_tools_config_path }}"
+  ansible.builtin.lineinfile:
+    path: "{{ dropbear_luks_unlock_initramfs_tools_config_path }}"
     line: >
       IP={{
-        dropbear_ip_config.ip
+        dropbear_luks_unlock_ip_config.ip
       }}::{{
-        dropbear_ip_config.gateway
+        dropbear_luks_unlock_ip_config.gateway
       }}:{{
-        dropbear_ip_config.netmask
+        dropbear_luks_unlock_ip_config.netmask
       }}:{{
-        dropbear_ip_config.hostname
+        dropbear_luks_unlock_ip_config.hostname
       }}:{{
-        dropbear_ip_config.interface
+        dropbear_luks_unlock_ip_config.interface
       }}
     regex: "^#?IP="
   notify: "rebuild-initramfs"
 
 - name: "Instruct initramfs-tools to load the dropbear module"
-  lineinfile:
-    path: "{{ initramfs_tools_config_path }}"
+  ansible.builtin.lineinfile:
+    path: "{{ dropbear_luks_unlock_initramfs_tools_config_path }}"
     line: "DROPBEAR=y"
     regex: "^#?DROPBEAR="
   notify: "rebuild-initramfs"
 
 - name: "Load additional modules"
-  lineinfile:
-    path: "{{ initramfs_tools_module_config_path }}"
+  ansible.builtin.lineinfile:
+    path: "{{ dropbear_luks_unlock_initramfs_tools_module_config_path }}"
     line: "{{ module }}"
     state: "present"
-  loop: "{{ initramfs_modules_to_load }}"
+  loop: "{{ dropbear_luks_unlock_initramfs_modules_to_load }}"
   loop_control: {loop_var: "module"}
   notify: "rebuild-initramfs"
 
 - name: "Deploy authorized SSH keys for dropbear"
-  lineinfile:
-    path: "{{ dropbear_initramfs_authorized_keys_path }}"
+  ansible.builtin.lineinfile:
+    path: "{{ dropbear_luks_unlock_initramfs_authorized_keys_path }}"
     line: "{{ pubkey_ssh }}"
     state: "{{ pubkey_state }}"
     create: true
@@ -77,6 +77,6 @@
   vars:
     pubkey_state: "{{ pubkey.state | default('present') if pubkey is mapping else 'present' }}"
     pubkey_ssh: "{{ pubkey.key if pubkey is mapping else pubkey }}"
-  loop: "{{ dropbear_authorized_keys }}"
+  loop: "{{ dropbear_luks_unlock_authorized_keys }}"
   loop_control: {loop_var: "pubkey"}
   notify: "rebuild-initramfs"
