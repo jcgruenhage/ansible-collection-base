@@ -10,8 +10,8 @@
     server_uri: "ldapi://{{ (ldap_sock_path + '/slapd.sock') | urlencode | replace('/', '%2F') }}"
   retries: 3
   delay: 3
-  register: "acl_res"
-  until: "acl_res is succeeded"
+  register: "ldap_acl_res"
+  until: "ldap_acl_res is succeeded"
   tags: ["deploy", "deploy-ldap", "ldap-sync", "ldap-sync-acl"]
 
 - name: "Ensure rootDN credentials up-to-date"
