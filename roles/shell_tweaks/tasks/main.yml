@@ -1,12 +1,12 @@
 ---
 - name: "Ensure terminfo packages are present"
-  apt:
+  ansible.builtin.apt:
     name: "{{ shell_tweaks_packages_terminfo }}"
     state: "present"
   when: "ansible_facts['pkg_mgr'] == 'apt'"
 
 - name: "Ensure terminfo packages are present"
-  package:
+  ansible.builtin.package:
     name: "{{ shell_tweaks_packages_terminfo }}"
     state: "present"
   when: "ansible_facts['pkg_mgr'] != 'apt'"
