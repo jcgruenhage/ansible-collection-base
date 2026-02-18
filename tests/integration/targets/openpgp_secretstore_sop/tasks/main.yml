@@ -62,7 +62,7 @@
     dest: "{{ cert_d_path }}/cert.asc"
     mode: "0644"
 
-- name: Get fingerprint from cert (gpg show-only import)
+- name: Get fingerprint from cert (gpg show-only import) # noqa: risky-shell-pipe
   ansible.builtin.shell: |
     gpg --with-colons --import-options show-only --import "{{ cert_d_path }}/cert.asc" 2>/dev/null | grep '^fpr:' | head -1 | cut -d: -f10
   register: fingerprint_out
@@ -136,7 +136,7 @@
 
 # --- Git repo + re-encryption with a second key ---
 
-- name: Initialize git repo and create initial commit
+- name: Initialize git repo and create initial commit # noqa: command-instead-of-module
   ansible.builtin.shell:
     cmd: |
       git init
@@ -179,7 +179,7 @@
     dest: "{{ cert_d_path }}/cert2.asc"
     mode: "0644"
 
-- name: Get fingerprint of second cert
+- name: Get fingerprint of second cert # noqa: risky-shell-pipe
   ansible.builtin.shell: |
     gpg --with-colons --import-options show-only --import "{{ cert_d_path }}/cert2.asc" 2>/dev/null | grep '^fpr:' | head -1 | cut -d: -f10
   register: fingerprint2_out
