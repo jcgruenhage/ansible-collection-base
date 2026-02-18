@@ -81,7 +81,7 @@
     - systemd_daemon_reload
 
 - name: Ensure handlers are flushed so systemd services are available
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers
 
 - name: Ensure restic systemd service is enabled
   ansible.builtin.systemd:
