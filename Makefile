@@ -10,7 +10,7 @@ format: ruff-format
 
 lint: ruff-check ty-check ansible-sanity
 
-test: ansible-units
+test: ansible-units ansible-integration
 
 ruff-format:
 	uv run ruff format
@@ -36,3 +36,11 @@ ansible-units:
 	uv run ansible-test units --python 3.13
 	uv sync --python 3.14 --dev
 	uv run ansible-test units --python 3.14
+
+ansible-integration:
+	uv sync --python 3.12 --dev
+	uv run ansible-test integration --python 3.12
+	uv sync --python 3.13 --dev
+	uv run ansible-test integration --python 3.13
+	uv sync --python 3.14 --dev
+	uv run ansible-test integration --python 3.14

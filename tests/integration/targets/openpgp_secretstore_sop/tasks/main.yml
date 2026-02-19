@@ -1,0 +1,349 @@
+---
+# Integration tests for famedly.base.openpgp_secretstore with SOP backend.
+# Requires rsop binary and gpg (for fingerprint from cert). Skips when rsop is missing.
+# See: https://docs.ansible.com/projects/ansible/latest/community/collection_contributors/collection_integration_about.html
+
+- name: Check rsop is available
+  ansible.builtin.command: which rsop
+  register: rsop_check
+  ignore_errors: true
+  changed_when: false
+
+- name: End play when rsop not found (target still passes)
+  ansible.builtin.meta: end_play
+  when: rsop_check.rc != 0
+
+- name: Get rsop path for environment
+  ansible.builtin.command: which rsop
+  register: rsop_path_out
+  changed_when: false
+
+- name: Set rsop path and test root
+  ansible.builtin.set_fact:
+    rsop_path: "{{ rsop_path_out.stdout | trim }}"
+    test_root: "{{ ansible_env.TMPDIR | default('/tmp') }}/openpgp_secretstore_sop_{{ ansible_date_time.epoch }}"
+
+- name: Set derived test paths
+  ansible.builtin.set_fact:
+    store_path: "{{ test_root }}/store"
+    cert_d_path: "{{ test_root }}/cert.d"
+    key_path: "{{ test_root }}/secret.asc"
+
+- name: Create test directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ store_path }}"
+    - "{{ cert_d_path }}"
+
+- name: Generate secret key with rsop
+  ansible.builtin.shell: |
+    {{ rsop_path }} generate-key "Test <test@example.com>"
+  register: key_out
+  changed_when: false
+
+- name: Write secret key to file
+  ansible.builtin.copy:
+    content: "{{ key_out.stdout }}"
+    dest: "{{ key_path }}"
+    mode: "0600"
+
+- name: Extract certificate from secret key
+  ansible.builtin.shell: |
+    {{ rsop_path }} extract-cert < "{{ key_path }}"
+  register: cert_out
+  changed_when: false
+
+- name: Write cert to temp file for fingerprint extraction
+  ansible.builtin.copy:
+    content: "{{ cert_out.stdout }}"
+    dest: "{{ cert_d_path }}/cert.asc"
+    mode: "0644"
+
+- name: Get fingerprint from cert (gpg show-only import)
+  ansible.builtin.shell: |
+    gpg --with-colons --import-options show-only --import "{{ cert_d_path }}/cert.asc" 2>/dev/null | grep '^fpr:' | head -1 | cut -d: -f10
+  register: fingerprint_out
+  changed_when: false
+
+- name: Set fingerprint fact
+  ansible.builtin.set_fact:
+    test_fingerprint: "{{ fingerprint_out.stdout | trim | lower }}"
+
+- name: Create PGP cert-d layout (first2/rest)
+  ansible.builtin.file:
+    path: "{{ cert_d_path }}/{{ test_fingerprint[:2] }}"
+    state: directory
+    mode: "0755"
+
+- name: Write cert into cert-d by fingerprint
+  ansible.builtin.copy:
+    content: "{{ cert_out.stdout }}"
+    dest: "{{ cert_d_path }}/{{ test_fingerprint[:2] }}/{{ test_fingerprint[2:] }}"
+    mode: "0644"
+
+- name: Write .gpg-id in store
+  ansible.builtin.copy:
+    content: "{{ test_fingerprint }}\n"
+    dest: "{{ store_path }}/.gpg-id"
+    mode: "0644"
+
+- name: Run openpgp_secretstore to create secret (first time)
+  famedly.base.openpgp_secretstore:
+    password_store_path: "{{ store_path }}"
+    password_slug: "test/sop_secret"
+  environment:
+    ANSIBLE_OPENPGP_SECRETSTORE_SOP_EXEC: "{{ rsop_path }}"
+    ANSIBLE_OPENPGP_SECRETSTORE_SOP_DECRYPTION_KEY: "{{ key_path }}"
+    PGP_CERT_D: "{{ cert_d_path }}"
+  register: create_result
+
+- name: Assert first run reports changed and returns a secret
+  ansible.builtin.assert:
+    that:
+      - create_result is changed
+      - create_result.secret | length > 0
+    fail_msg: "First run should create secret and report changed with non-empty secret."
+
+- name: Run openpgp_secretstore again (idempotency)
+  famedly.base.openpgp_secretstore:
+    password_store_path: "{{ store_path }}"
+    password_slug: "test/sop_secret"
+  environment:
+    ANSIBLE_OPENPGP_SECRETSTORE_SOP_EXEC: "{{ rsop_path }}"
+    ANSIBLE_OPENPGP_SECRETSTORE_SOP_DECRYPTION_KEY: "{{ key_path }}"
+    PGP_CERT_D: "{{ cert_d_path }}"
+  register: second_result
+
+- name: Assert second run reports no change (idempotent)
+  ansible.builtin.assert:
+    that:
+      - not second_result is changed
+      - second_result.secret == create_result.secret
+    fail_msg: "Second run should be idempotent and return same secret."
+
+- name: Check encrypted file exists on disk
+  ansible.builtin.stat:
+    path: "{{ store_path }}/test/sop_secret.gpg"
+  register: secret_file
+
+- name: Assert encrypted secret file exists
+  ansible.builtin.assert:
+    that: secret_file.stat.exists
+    fail_msg: "Secret file test/sop_secret.gpg should exist in store."
+
+# --- Git repo + re-encryption with a second key ---
+
+- name: Initialize git repo and create initial commit
+  ansible.builtin.shell:
+    cmd: |
+      git init
+      git config user.email "test@example.com"
+      git config user.name "Test"
+      git config commit.gpgsign false
+      git add -A
+      git commit -m "Initial commit"
+    chdir: "{{ store_path }}"
+  changed_when: true
+
+- name: Record HEAD after init
+  ansible.builtin.command:
+    cmd: git rev-parse HEAD
+    chdir: "{{ store_path }}"
+  register: head_after_init
+  changed_when: false
+
+- name: Generate second secret key with rsop
+  ansible.builtin.shell: |
+    {{ rsop_path }} generate-key "Second <second@example.com>"
+  register: key2_out
+  changed_when: false
+
+- name: Write second secret key to file
+  ansible.builtin.copy:
+    content: "{{ key2_out.stdout }}"
+    dest: "{{ test_root }}/secret2.asc"
+    mode: "0600"
+
+- name: Extract certificate from second key
+  ansible.builtin.shell: |
+    {{ rsop_path }} extract-cert < "{{ test_root }}/secret2.asc"
+  register: cert2_out
+  changed_when: false
+
+- name: Write second cert to temp file for fingerprint extraction
+  ansible.builtin.copy:
+    content: "{{ cert2_out.stdout }}"
+    dest: "{{ cert_d_path }}/cert2.asc"
+    mode: "0644"
+
+- name: Get fingerprint of second cert
+  ansible.builtin.shell: |
+    gpg --with-colons --import-options show-only --import "{{ cert_d_path }}/cert2.asc" 2>/dev/null | grep '^fpr:' | head -1 | cut -d: -f10
+  register: fingerprint2_out
+  changed_when: false
+
+- name: Set second fingerprint fact
+  ansible.builtin.set_fact:
+    test_fingerprint2: "{{ fingerprint2_out.stdout | trim | lower }}"
+
+- name: Create cert-d directory for second key
+  ansible.builtin.file:
+    path: "{{ cert_d_path }}/{{ test_fingerprint2[:2] }}"
+    state: directory
+    mode: "0755"
+
+- name: Write second cert into cert-d by fingerprint
+  ansible.builtin.copy:
+    content: "{{ cert2_out.stdout }}"
+    dest: "{{ cert_d_path }}/{{ test_fingerprint2[:2] }}/{{ test_fingerprint2[2:] }}"
+    mode: "0644"
+
+- name: Update .gpg-id to include both keys
+  ansible.builtin.copy:
+    content: "{{ test_fingerprint }}\n{{ test_fingerprint2 }}\n"
+    dest: "{{ store_path }}/.gpg-id"
+    mode: "0644"
+
+- name: Run openpgp_secretstore after adding second recipient (should re-encrypt)
+  famedly.base.openpgp_secretstore:
+    password_store_path: "{{ store_path }}"
+    password_slug: "test/sop_secret"
+  environment:
+    ANSIBLE_OPENPGP_SECRETSTORE_SOP_EXEC: "{{ rsop_path }}"
+    ANSIBLE_OPENPGP_SECRETSTORE_SOP_DECRYPTION_KEY: "{{ key_path }}"
+    PGP_CERT_D: "{{ cert_d_path }}"
+  register: reencrypt_result
+
+- name: Assert re-encryption happened and secret is unchanged
+  ansible.builtin.assert:
+    that:
+      - reencrypt_result is changed
+      - reencrypt_result.secret == create_result.secret
+    fail_msg: "Adding a second recipient should trigger re-encryption with the same secret value."
+
+- name: Record HEAD after recrypt
+  ansible.builtin.command:
+    cmd: git rev-parse HEAD
+    chdir: "{{ store_path }}"
+  register: head_after_recrypt
+  changed_when: false
+
+- name: Assert git HEAD advanced after recrypt
+  ansible.builtin.assert:
+    that:
+      - head_after_recrypt.stdout != head_after_init.stdout
+    fail_msg: "Re-encryption should have created a new git commit."
+
+# --- Overwrite (secret rotation) ---
+
+- name: Run openpgp_secretstore with overwrite (should regenerate)
+  famedly.base.openpgp_secretstore:
+    password_store_path: "{{ store_path }}"
+    password_slug: "test/sop_secret"
+    overwrite: true
+  environment:
+    ANSIBLE_OPENPGP_SECRETSTORE_SOP_EXEC: "{{ rsop_path }}"
+    ANSIBLE_OPENPGP_SECRETSTORE_SOP_DECRYPTION_KEY: "{{ key_path }}"
+    PGP_CERT_D: "{{ cert_d_path }}"
+  register: overwrite_result
+
+- name: Assert overwrite reports changed with a new secret
+  ansible.builtin.assert:
+    that:
+      - overwrite_result is changed
+      - overwrite_result.secret | length > 0
+      - overwrite_result.secret != create_result.secret
+    fail_msg: "Overwrite should generate a different secret."
+
+- name: Run openpgp_secretstore again after overwrite (idempotency)
+  famedly.base.openpgp_secretstore:
+    password_store_path: "{{ store_path }}"
+    password_slug: "test/sop_secret"
+  environment:
+    ANSIBLE_OPENPGP_SECRETSTORE_SOP_EXEC: "{{ rsop_path }}"
+    ANSIBLE_OPENPGP_SECRETSTORE_SOP_DECRYPTION_KEY: "{{ key_path }}"
+    PGP_CERT_D: "{{ cert_d_path }}"
+  register: after_overwrite_result
+
+- name: Assert idempotency after overwrite
+  ansible.builtin.assert:
+    that:
+      - not after_overwrite_result is changed
+      - after_overwrite_result.secret == overwrite_result.secret
+    fail_msg: "Re-reading after overwrite should return the new secret unchanged."
+
+- name: Record HEAD after overwrite
+  ansible.builtin.command:
+    cmd: git rev-parse HEAD
+    chdir: "{{ store_path }}"
+  register: head_after_overwrite
+  changed_when: false
+
+- name: Assert git HEAD advanced after overwrite
+  ansible.builtin.assert:
+    that:
+      - head_after_overwrite.stdout != head_after_recrypt.stdout
+    fail_msg: "Overwrite should have created a new git commit."
+
+# --- State absent (deletion) ---
+
+- name: Run openpgp_secretstore with state=absent (should delete)
+  famedly.base.openpgp_secretstore:
+    password_store_path: "{{ store_path }}"
+    password_slug: "test/sop_secret"
+    state: absent
+  environment:
+    ANSIBLE_OPENPGP_SECRETSTORE_SOP_EXEC: "{{ rsop_path }}"
+    ANSIBLE_OPENPGP_SECRETSTORE_SOP_DECRYPTION_KEY: "{{ key_path }}"
+    PGP_CERT_D: "{{ cert_d_path }}"
+  register: delete_result
+
+- name: Assert deletion reports changed
+  ansible.builtin.assert:
+    that:
+      - delete_result is changed
+    fail_msg: "state=absent should report changed when the secret exists."
+
+- name: Check encrypted file is gone
+  ansible.builtin.stat:
+    path: "{{ store_path }}/test/sop_secret.gpg"
+  register: secret_file_after_delete
+
+- name: Assert encrypted secret file no longer exists
+  ansible.builtin.assert:
+    that:
+      - not secret_file_after_delete.stat.exists
+    fail_msg: "Secret file should be removed after state=absent."
+
+- name: Record HEAD after deletion
+  ansible.builtin.command:
+    cmd: git rev-parse HEAD
+    chdir: "{{ store_path }}"
+  register: head_after_delete
+  changed_when: false
+
+- name: Assert git HEAD advanced after delete
+  ansible.builtin.assert:
+    that:
+      - head_after_delete.stdout != head_after_overwrite.stdout
+    fail_msg: "Deletion should have created a new git commit."
+
+- name: Run openpgp_secretstore with state=absent again (idempotency)
+  famedly.base.openpgp_secretstore:
+    password_store_path: "{{ store_path }}"
+    password_slug: "test/sop_secret"
+    state: absent
+  environment:
+    ANSIBLE_OPENPGP_SECRETSTORE_SOP_EXEC: "{{ rsop_path }}"
+    ANSIBLE_OPENPGP_SECRETSTORE_SOP_DECRYPTION_KEY: "{{ key_path }}"
+    PGP_CERT_D: "{{ cert_d_path }}"
+  register: delete_again_result
+
+- name: Assert second deletion is idempotent
+  ansible.builtin.assert:
+    that:
+      - not delete_again_result is changed
+    fail_msg: "state=absent on an already-deleted secret should report no change."
