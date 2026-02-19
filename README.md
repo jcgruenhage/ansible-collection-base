@@ -22,6 +22,14 @@ to build services on.
 
 ## Plugins
 
+### Modules
+
+- **`openpgp_secretstore`** — save and retrieve secrets from a [`pass`](https://www.passwordstore.org/)-compatible store with GnuPG or SOP backends. See [SECRETSTORE.md](SECRETSTORE.md) for details.
+
+### Lookups
+
+- **`openpgp_secretstore`** — read-only lookup for the same store. See [SECRETSTORE.md](SECRETSTORE.md).
+
 ### Filters
 
 - **`consensus`** — assert all values in a dict are equal; return the common value
@@ -30,6 +38,10 @@ to build services on.
 - **`reject_keys`** — remove specified keys from a dict
 - **`select_keys`** — keep only specified keys from a dict
 - **`intersect`** — ordered set intersection of two lists
+
+## Testing
+
+See **[TESTING.md](TESTING.md)** for unit and integration test instructions.
 
 ## License
 
