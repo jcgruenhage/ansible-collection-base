@@ -1,0 +1,3 @@
+# Integration target: openpgp_secretstore module with SOP backend (requires rsop binary).
+# See https://docs.ansible.com/ansible/latest/dev_guide/testing/sanity/integration-aliases.html
+shippable/posix/group1
