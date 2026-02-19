@@ -1,0 +1,2 @@
+[testgroup]
+testhost ansible_connection='local' ansible_pipelining='yes' ansible_python_interpreter='/home/jcgruenhage/dev/jcg.re/jcgruenhage/ansible-jcgruenhage/ansible_collections/famedly/base/.venv/bin/python'
