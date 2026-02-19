@@ -8,8 +8,10 @@ version = "0.2.0"
 source = { virtual = "." }
 dependencies = [
     { name = "ansible-core" },
+    { name = "dataclass-wizard", extra = ["yaml"] },
     { name = "filelock" },
     { name = "gitpython" },
+    { name = "pgpy13" },
     { name = "python-gnupg" },
     { name = "pyyaml" },
 ]
@@ -26,10 +28,14 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "ansible-core", specifier = ">=2.17.0,<2.21.0" },
+    { name = "dataclass-wizard", extras = ["yaml"], specifier = ">=0.39.1" },
     { name = "filelock", specifier = ">=3.0.12" },
     { name = "gitpython", specifier = ">=3.1.24" },
+    { name = "gitpython", specifier = ">=3.1.46" },
+    { name = "pgpy13", specifier = ">=0.6.1rc1" },
     { name = "python-gnupg", specifier = ">=0.4.8" },
     { name = "pyyaml", specifier = ">=6.0" },
+    { name = "pyyaml", specifier = ">=6.0.3" },
 ]
 
 [package.metadata.requires-dev]
@@ -183,6 +189,23 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/96/93/682d2b43c1d5f1406ed048f377c0fc9fc8f7b0447a478d5c65ab3d3a66eb/cryptography-46.0.5-cp38-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:ced80795227d70549a411a4ab66e8ce307899fad2220ce5ab2f296e687eacde9", size = 4667123, upload-time = "2026-02-10T19:18:15.886Z" },
     { url = "https://files.pythonhosted.org/packages/45/2d/9c5f2926cb5300a8eefc3f4f0b3f3df39db7f7ce40c8365444c49363cbda/cryptography-46.0.5-cp38-abi3-win32.whl", hash = "sha256:02f547fce831f5096c9a567fd41bc12ca8f11df260959ecc7c3202555cc47a72", size = 3010220, upload-time = "2026-02-10T19:18:17.361Z" },
     { url = "https://files.pythonhosted.org/packages/48/ef/0c2f4a8e31018a986949d34a01115dd057bf536905dca38897bacd21fac3/cryptography-46.0.5-cp38-abi3-win_amd64.whl", hash = "sha256:556e106ee01aa13484ce9b0239bca667be5004efb0aabbed28d353df86445595", size = 3467050, upload-time = "2026-02-10T19:18:18.899Z" },
+]
+
+[[package]]
+name = "dataclass-wizard"
+version = "0.39.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/36/ea/6b2811092feecbe9d672e3641196ac5fcbec6664074da5dec8b9fd9b9059/dataclass_wizard-0.39.1.tar.gz", hash = "sha256:1679948ed7c62103f40b34df97d03b35e6b2ad50f58173fdbe30074e2e4730f2", size = 361190, upload-time = "2026-01-06T03:30:57.054Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/27/a0/a221942b3fbbafaea4e211744d298366b6a9712c1aa336b05fc1c865ac0c/dataclass_wizard-0.39.1-py3-none-any.whl", hash = "sha256:3324e59eca705882eb34e2b3989b2beadd8c2b523e6269d4002cf1a4a5bf703b", size = 215344, upload-time = "2026-01-06T03:30:54.915Z" },
+]
+
+[package.optional-dependencies]
+yaml = [
+    { name = "pyyaml" },
 ]
 
 [[package]]
@@ -348,6 +371,19 @@ wheels = [
 ]
 
 [[package]]
+name = "pgpy13"
+version = "0.6.1rc1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "cryptography" },
+    { name = "pyasn1" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/27/4a/49f87efd9c320d25b2edda4d9bda520607fbc12338cd1030468d830f29bb/pgpy13-0.6.1rc1.tar.gz", hash = "sha256:398d71b8c5b0852c79c7b4598c0c98f7458f39b439b62068cfb49b19caaf5912", size = 603304, upload-time = "2025-03-01T22:27:18.879Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4f/de/8e43636f1244989fb733513fa7c1252a3f82feda4ee861ec1b6377f2e6e7/pgpy13-0.6.1rc1-py3-none-any.whl", hash = "sha256:c8d6cf3dea0cc23373ff1c4ed79a6a4bf39216bf54970bae7cca656003d1aa4f", size = 84589, upload-time = "2025-03-01T22:27:17.242Z" },
+]
+
+[[package]]
 name = "platformdirs"
 version = "4.9.2"
 source = { registry = "https://pypi.org/simple" }
@@ -363,6 +399,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/f9/e2/3e91f31a7d2b083fe6ef3fa267035b518369d9511ffab804f839851d2779/pluggy-1.6.0.tar.gz", hash = "sha256:7dcc130b76258d33b90f61b658791dede3486c3e6bfb003ee5c9bfb396dd22f3", size = 69412, upload-time = "2025-05-15T12:30:07.975Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/54/20/4d324d65cc6d9205fabedc306948156824eb9f0ee1633355a8f7ec5c66bf/pluggy-1.6.0-py3-none-any.whl", hash = "sha256:e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746", size = 20538, upload-time = "2025-05-15T12:30:06.134Z" },
+]
+
+[[package]]
+name = "pyasn1"
+version = "0.6.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/fe/b6/6e630dff89739fcd427e3f72b3d905ce0acb85a45d4ec3e2678718a3487f/pyasn1-0.6.2.tar.gz", hash = "sha256:9b59a2b25ba7e4f8197db7686c09fb33e658b98339fadb826e9512629017833b", size = 146586, upload-time = "2026-01-16T18:04:18.534Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/44/b5/a96872e5184f354da9c84ae119971a0a4c221fe9b27a4d94bd43f2596727/pyasn1-0.6.2-py3-none-any.whl", hash = "sha256:1eb26d860996a18e9b6ed05e7aae0e9fc21619fcee6af91cca9bad4fbea224bf", size = 83371, upload-time = "2026-01-16T18:04:17.174Z" },
 ]
 
 [[package]]
@@ -559,4 +604,13 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/c5/2d/2663984ac11de6d78f74432b8b14ba64d170b45194312852b7543cf7fd56/ty-0.0.17-py3-none-win32.whl", hash = "sha256:305b6ed150b2740d00a817b193373d21f0767e10f94ac47abfc3b2e5a5aec809", size = 9672932, upload-time = "2026-02-13T13:27:08.522Z" },
     { url = "https://files.pythonhosted.org/packages/de/b5/39be78f30b31ee9f5a585969930c7248354db90494ff5e3d0756560fb731/ty-0.0.17-py3-none-win_amd64.whl", hash = "sha256:531828267527aee7a63e972f54e5eee21d9281b72baf18e5c2850c6b862add83", size = 10542138, upload-time = "2026-02-13T13:27:17.084Z" },
     { url = "https://files.pythonhosted.org/packages/40/b7/f875c729c5d0079640c75bad2c7e5d43edc90f16ba242f28a11966df8f65/ty-0.0.17-py3-none-win_arm64.whl", hash = "sha256:de9810234c0c8d75073457e10a84825b9cd72e6629826b7f01c7a0b266ae25b1", size = 10023068, upload-time = "2026-02-13T13:26:39.637Z" },
+]
+
+[[package]]
+name = "typing-extensions"
+version = "4.15.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/72/94/1a15dd82efb362ac84269196e94cf00f187f7ed21c242792a923cdb1c61f/typing_extensions-4.15.0.tar.gz", hash = "sha256:0cea48d173cc12fa28ecabc3b837ea3cf6f38c6d1136f85cbaaf598984861466", size = 109391, upload-time = "2025-08-25T13:49:26.313Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/18/67/36e9267722cc04a6b9f15c7f3441c2363321a3ea07da7ae0c0707beb2a9c/typing_extensions-4.15.0-py3-none-any.whl", hash = "sha256:f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548", size = 44614, upload-time = "2025-08-25T13:49:24.86Z" },
 ]
