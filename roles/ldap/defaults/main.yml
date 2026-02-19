@@ -86,7 +86,7 @@ ldap_root_pass_hash: ~
 ldap_rootdn: "cn={{ ldap_root_user }},{{ ldap_dn }}"
 ldap_config_db: "olcDatabase={1}mdb,cn=config"
 
-# Expects {name: "costumSchema.ldif", content: $fileContent}
+# Expects {name: "customSchema.ldif", content: $fileContent}
 ldap_additional_schemas: []
 ldap_additional_indices: []
 ldap_org_units:
