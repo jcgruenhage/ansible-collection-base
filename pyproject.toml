@@ -50,8 +50,6 @@ exclude = [
     "tests/unit/mock_secretstore.py",
     "tests/unit/test_gpg_secretstore.py",
     "tests/unit/utils.py",
-    # Type checks don't pass, resolve and then remove this exclude 
-    "plugins/filter/base.py"
 ]
 
 [dependency-groups]

@@ -1,10 +1,11 @@
 import collections
 import re
+from typing import Any, Dict
 
 from ansible.errors import AnsibleFilterError
 
 
-def consensus(pipe_in: dict[str], set: bool = False, msg=""):
+def consensus(pipe_in: Dict[str, Any], set: bool = False, msg=""):
     apply = FilterModule.xset if set else id
     [head, *tail] = map(apply, pipe_in.values())
     if not all(head == x for x in tail):
