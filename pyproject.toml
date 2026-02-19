@@ -1,0 +1,11 @@
+[project]
+name = "ansible-collection-base"
+version = "0.2.0"
+description = "Ansible collection famedly.base"
+readme = "README.md"
+# 3.12 for controller, targets support >=3.9.0 still
+requires-python = ">=3.12.0,<3.15.0"
+
+dependencies = [
+    "ansible-core>=2.17.0,<2.21.0",
+]
