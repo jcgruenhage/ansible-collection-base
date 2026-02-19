@@ -72,6 +72,7 @@ ldap_management_container_image_name: "phpldapadmin"
 ldap_management_container_ports: []
 ldap_management_container_env: {}
 ldap_management_container_labels: {}
+ldap_management_container_volumes: []
 ldap_management_container_pull: true
 ldap_management_container_recreate: false
 

@@ -15,6 +15,7 @@
     ports: "{{ ldap_management_container_ports }}"
     labels: "{{ ldap_management_container_labels_complete }}"
     env: "{{ ldap_management_container_env }}"
+    volumes: "{{ ldap_management_container_volumes }}"
     restart_policy: "unless-stopped"
     recreate: "{{ ldap_management_container_recreate }}"
     pull: "{{ ldap_management_container_pull }}"
