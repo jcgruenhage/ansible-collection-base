@@ -1,4 +1,4 @@
-all: lock venv format lint
+all: lock venv format lint test
 
 venv:
 	uv sync --dev
@@ -8,7 +8,9 @@ lock:
 
 format: ruff-format
 
-lint: ruff-check ty-check
+lint: ruff-check ty-check ansible-sanity
+
+test: ansible-units
 
 ruff-format:
 	uv run ruff format
@@ -18,3 +20,19 @@ ruff-check:
 
 ty-check:
 	uv run ty check
+
+ansible-sanity:
+	uv sync --python 3.12 --dev
+	uv run ansible-test sanity --python 3.12
+	uv sync --python 3.13 --dev
+	uv run ansible-test sanity --python 3.13
+	uv sync --python 3.14 --dev
+	uv run ansible-test sanity --python 3.14
+
+ansible-units:
+	uv sync --python 3.12 --dev
+	uv run ansible-test units --python 3.12
+	uv sync --python 3.13 --dev
+	uv run ansible-test units --python 3.13
+	uv sync --python 3.14 --dev
+	uv run ansible-test units --python 3.14
