@@ -34,7 +34,28 @@ extend-exclude = [
 "plugins/lookup/*.py" = ["E402"]
 "plugins/module_utils/**/*.py" = ["E402"]
 
+[tool.ty.environment]
+# Ansible collections must live under ansible_collections/<namespace>/<name>/,
+# so ../../.. reaches the directory that contains the ansible_collections tree.
+extra-paths = ["../../.."]
+
+# The GnuPG secretstore needs some work before it can pass type checking. The 
+[tool.ty.src]
+exclude = [
+    # The GnuPG secretstore needs some work before it can pass type checking. The 
+    "plugins/module_utils/gpg_utils.py",
+    "plugins/lookup/gpg_secretstore.py",
+    "plugins/modules/gpg_secretstore.py",
+    "tests/unit/mock_filelock.py",
+    "tests/unit/mock_secretstore.py",
+    "tests/unit/test_gpg_secretstore.py",
+    "tests/unit/utils.py",
+    # Type checks don't pass, resolve and then remove this exclude 
+    "plugins/filter/base.py"
+]
+
 [dependency-groups]
 dev = [
     "ruff>=0.15.1",
+    "ty>=0.0.17",
 ]
