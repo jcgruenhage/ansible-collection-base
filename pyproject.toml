@@ -13,3 +13,28 @@ dependencies = [
     "filelock>=3.0.12",
     "python-gnupg>=0.4.8",
 ]
+
+# The GnuPG secretstore needs some work before it can pass ruff lints.
+[tool.ruff]
+extend-exclude = [
+    "plugins/module_utils/gpg_utils.py",
+    "plugins/lookup/gpg_secretstore.py",
+    "plugins/modules/gpg_secretstore.py",
+    "tests/unit/mock_filelock.py",
+    "tests/unit/mock_secretstore.py",
+    "tests/unit/test_gpg_secretstore.py",
+    "tests/unit/utils.py",
+]
+
+# Ansible modules and lookup plugins must have DOCUMENTATION/EXAMPLES/RETURN
+# (and often ANSIBLE_METADATA) before the real imports, so imports are not
+# at the top of the file. module_utils sometimes uses late/optional imports.
+[tool.ruff.lint.per-file-ignores]
+"plugins/modules/*.py" = ["E402"]
+"plugins/lookup/*.py" = ["E402"]
+"plugins/module_utils/**/*.py" = ["E402"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.1",
+]
