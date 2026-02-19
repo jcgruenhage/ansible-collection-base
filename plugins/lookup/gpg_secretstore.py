@@ -15,6 +15,10 @@ author:
     - Jadyn Emma Jäger (@jadyndev)
     - Jan Christian Grünhage (@jcgruenhage)
 short_description: read passwords that are compatible with passwordstore.org's pass utility
+deprecated:
+  removed_in: "1.0.0"
+  why: Replaced by openpgp_secretstore, which supports multiple OpenPGP backends.
+  alternative: Use M(famedly.base.openpgp_secretstore) instead.
 description:
   - Enables Ansible to read passwords/secrets from the passwordstore.org pass utility.
   - It's also able to read yaml/json files if needed
