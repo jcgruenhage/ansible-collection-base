@@ -20,6 +20,17 @@ to build services on.
 - [`roles/ssh`](roles/ssh/README.md) for SSH hardening
 - [`roles/user`](roles/user/README.md) for creating user accounts with SSH keys deployed
 
+## Plugins
+
+### Filters
+
+- **`consensus`** — assert all values in a dict are equal; return the common value
+- **`split2multidict`** — split lines into a multidict (key → list of values)
+- **`regex_replace`** — regex substitution with optional required-match count
+- **`reject_keys`** — remove specified keys from a dict
+- **`select_keys`** — keep only specified keys from a dict
+- **`intersect`** — ordered set intersection of two lists
+
 ## License
 
 [AGPL-3.0-only](LICENSE.md)
