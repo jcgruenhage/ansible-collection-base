@@ -1,1 +1,3 @@
+roles/docker/vars/Alpine.yml shebang
+roles/docker/vars/main.yml shebang
 roles/lego/templates/metrics-textfile.py.j2 shebang
