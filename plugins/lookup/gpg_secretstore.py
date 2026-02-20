@@ -70,7 +70,6 @@ _raw:
 """
 
 from ansible.plugins.lookup import LookupBase
-from ansible.module_utils.six import raise_from
 from ansible.module_utils.basic import missing_required_lib
 from ansible.errors import AnsibleError
 from ansible_collections.famedly.base.plugins.module_utils.gpg_utils import (
@@ -87,10 +86,7 @@ class LookupModule(LookupBase):
             errors.append(missing_required_lib(lib))
             traceback.append(exception)
         if errors:
-            raise_from(
-                AnsibleError("\n".join(errors)),
-                "\n".join(traceback),
-            )
+            raise AnsibleError("\n".join(errors))
 
         data_type = kwargs.get("data_type", "plain")
         password_store_path = kwargs.get("password_store_path", "~/.password-store/")
