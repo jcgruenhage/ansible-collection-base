@@ -1,3 +1,5 @@
+plugins/lookup/gpg_secretstore.py validate-modules:missing-gplv3-license
+plugins/modules/gpg_secretstore.py validate-modules:missing-gplv3-license
 roles/docker/vars/Alpine.yml shebang
 roles/docker/vars/main.yml shebang
 roles/lego/templates/metrics-textfile.py.j2 shebang
