@@ -1,25 +1,2 @@
 # This file contains ignores rule violations for ansible-lint
-roles/docker/defaults/main.yml jinja[spacing]
-roles/docker/defaults/main.yml yaml[line-length]
-roles/docker/handlers/main.yml fqcn[action-core]
-roles/docker/handlers/main.yml name[casing]
-roles/docker/meta/main.yml schema[meta]
-roles/docker/tasks/docker-compose.yml fqcn[action-core]
-roles/docker/tasks/docker-compose.yml name[missing]
-roles/docker/tasks/docker-compose.yml yaml[octal-values]
-roles/docker/tasks/docker-users.yml fqcn[action-core]
-roles/docker/tasks/main.yml fqcn[action-core]
-roles/docker/tasks/main.yml jinja[spacing]
-roles/docker/tasks/main.yml literal-compare
-roles/docker/tasks/main.yml name[missing]
-roles/docker/tasks/main.yml yaml[line-length]
-roles/docker/tasks/main.yml yaml[octal-values]
-roles/docker/tasks/setup-Debian.yml command-instead-of-module
-roles/docker/tasks/setup-Debian.yml fqcn[action-core]
-roles/docker/tasks/setup-Debian.yml no-changed-when
-roles/docker/tasks/setup-Debian.yml no-free-form
-roles/docker/tasks/setup-Debian.yml risky-shell-pipe
-roles/docker/tasks/setup-RedHat.yml fqcn[action-core]
-roles/docker/tasks/setup-RedHat.yml fqcn[action]
-roles/docker/tasks/setup-RedHat.yml key-order[task]
-roles/docker/tasks/setup-RedHat.yml yaml[octal-values]
+galaxy.yml galaxy[no-changelog]

@@ -8,7 +8,7 @@ lock:
 
 format: ruff-format
 
-lint: ruff-check ty-check ansible-sanity
+lint: ruff-check ty-check ansible-lint ansible-sanity
 
 test: ansible-units ansible-integration
 
@@ -20,6 +20,9 @@ ruff-check:
 
 ty-check:
 	uv run ty check
+
+ansible-lint:
+	uv run ansible-lint
 
 ansible-sanity:
 	uv sync --python 3.12 --dev

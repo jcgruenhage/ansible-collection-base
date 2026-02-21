@@ -58,6 +58,8 @@ exclude = [
 
 [dependency-groups]
 dev = [
+    "ansible>=13.3.0",
+    "ansible-lint>=26.1.1",
     "pylint>=4.0.4",
     "pytest-xdist>=3.8.0",
     "pytest>=9.0.2",
