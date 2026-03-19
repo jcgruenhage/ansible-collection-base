@@ -146,6 +146,20 @@
     that: secret_file.stat.exists
     fail_msg: "Secret file test/sop_secret.gpg should exist in store."
 
+# --- Lookup plugin ---
+
+- name: Read secret via lookup plugin
+  ansible.builtin.set_fact:
+    lookup_secret: >-
+      {{ lookup('famedly.base.openpgp_secretstore', 'test/sop_secret',
+                password_store_path=store_path, config_path=config_path) }}
+
+- name: Assert lookup returns same secret as module
+  ansible.builtin.assert:
+    that:
+      - lookup_secret == create_result.secret
+    fail_msg: "Lookup plugin should return the same secret as the module."
+
 # --- Git repo + re-encryption with a second key ---
 
 - name: Initialize git repo and create initial commit # noqa: command-instead-of-module
