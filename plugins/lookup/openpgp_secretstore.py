@@ -109,6 +109,16 @@ class LookupModule(LookupBase):
                 )
             )
 
+        from ansible_collections.famedly.base.plugins.module_utils.util import (
+            MISSING_IMPORTS,
+        )
+
+        if MISSING_IMPORTS:
+            libs = ", ".join(sorted(MISSING_IMPORTS))
+            raise AnsibleError(
+                missing_required_lib(libs)
+            )
+
         try:
             store = SecretStore(
                 password_store_path=Path(password_store_path)
