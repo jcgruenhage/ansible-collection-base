@@ -330,13 +330,15 @@ def _validate_secretstore_config(
 
 def load_secretstore_config(
     password_store_path: Optional[Path] = None,
+    config_path: Optional[Path] = None,
 ) -> SecretStoreConfig:
     """Load YAML and env into raw config, validate, and return resolved SecretStoreConfig.
 
     C(password_store_path) overrides config/file; otherwise config value or default ~/.password-store/ is used.
+    C(config_path) overrides default config file location; if provided, that path is used instead of platform default.
     Raises on malformed YAML or incoherent config (e.g. backend=sop with missing key or executables).
     """
-    path = _get_config_file_path()
+    path = Path(config_path) if config_path is not None else _get_config_file_path()
     if not path.is_file():
         raw = _RawSecretStoreConfig()
         raw.apply_overrides_from_env()

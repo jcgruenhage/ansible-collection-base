@@ -36,6 +36,10 @@ options:
   check_recipients:
     description: Whether to verify ciphertext recipients match .gpg-id (and re-encrypt if not).
     default: true
+  config_path:
+    description: >
+      Path to a custom config file. When set, this file is used instead of the
+      platform-default config location. Useful for testing or isolated environments.
 """
 
 EXAMPLES = r"""
@@ -97,6 +101,7 @@ class LookupModule(LookupBase):
         password_store_path = kwargs.get("password_store_path", "~/.password-store")
         data_type = kwargs.get("data_type", "plain")
         check_recipients = kwargs.get("check_recipients", True)
+        config_path = kwargs.get("config_path")
 
         if not HAS_SECRETSTORE:
             raise AnsibleError(
@@ -123,6 +128,9 @@ class LookupModule(LookupBase):
             store = SecretStore(
                 password_store_path=Path(password_store_path)
                 if password_store_path
+                else None,
+                config_path=Path(config_path)
+                if config_path
                 else None,
                 generate=SecretGenerator(data_type=data_type),
             )

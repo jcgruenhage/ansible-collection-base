@@ -28,6 +28,9 @@
     store_path: "{{ test_root }}/store"
     cert_d_path: "{{ test_root }}/cert.d"
     key_path: "{{ test_root }}/secret.asc"
+    xdg_config_home: "{{ test_root }}/xdg_config"
+    config_dir: "{{ test_root }}/xdg_config/ansible-openpgp-secretstore"
+    config_path: "{{ test_root }}/xdg_config/ansible-openpgp-secretstore/config.yaml"
 
 - name: Create test directories
   ansible.builtin.file:
@@ -37,6 +40,7 @@
   loop:
     - "{{ store_path }}"
     - "{{ cert_d_path }}"
+    - "{{ config_dir }}"
 
 - name: Generate secret key with rsop
   ansible.builtin.shell: |
@@ -90,14 +94,25 @@
     dest: "{{ store_path }}/.gpg-id"
     mode: "0644"
 
+- name: Write test config file
+  ansible.builtin.copy:
+    content: >-
+      {{ test_config | to_yaml }}
+    dest: "{{ config_dir }}/config.yaml"
+    mode: "0644"
+  vars:
+    test_config:
+      pgp_cert_d: "{{ cert_d_path }}"
+      sop:
+        exec: "{{ rsop_path }}"
+        decryption:
+          key: "{{ key_path }}"
+
 - name: Run openpgp_secretstore to create secret (first time)
   famedly.base.openpgp_secretstore:
     password_store_path: "{{ store_path }}"
     password_slug: "test/sop_secret"
-  environment:
-    ANSIBLE_OPENPGP_SECRETSTORE_SOP_EXEC: "{{ rsop_path }}"
-    ANSIBLE_OPENPGP_SECRETSTORE_SOP_DECRYPTION_KEY: "{{ key_path }}"
-    PGP_CERT_D: "{{ cert_d_path }}"
+    config_path: "{{ config_path }}"
   register: create_result
 
 - name: Assert first run reports changed and returns a secret
@@ -111,10 +126,7 @@
   famedly.base.openpgp_secretstore:
     password_store_path: "{{ store_path }}"
     password_slug: "test/sop_secret"
-  environment:
-    ANSIBLE_OPENPGP_SECRETSTORE_SOP_EXEC: "{{ rsop_path }}"
-    ANSIBLE_OPENPGP_SECRETSTORE_SOP_DECRYPTION_KEY: "{{ key_path }}"
-    PGP_CERT_D: "{{ cert_d_path }}"
+    config_path: "{{ config_path }}"
   register: second_result
 
 - name: Assert second run reports no change (idempotent)
@@ -211,10 +223,7 @@
   famedly.base.openpgp_secretstore:
     password_store_path: "{{ store_path }}"
     password_slug: "test/sop_secret"
-  environment:
-    ANSIBLE_OPENPGP_SECRETSTORE_SOP_EXEC: "{{ rsop_path }}"
-    ANSIBLE_OPENPGP_SECRETSTORE_SOP_DECRYPTION_KEY: "{{ key_path }}"
-    PGP_CERT_D: "{{ cert_d_path }}"
+    config_path: "{{ config_path }}"
   register: reencrypt_result
 
 - name: Assert re-encryption happened and secret is unchanged
@@ -244,10 +253,7 @@
     password_store_path: "{{ store_path }}"
     password_slug: "test/sop_secret"
     overwrite: true
-  environment:
-    ANSIBLE_OPENPGP_SECRETSTORE_SOP_EXEC: "{{ rsop_path }}"
-    ANSIBLE_OPENPGP_SECRETSTORE_SOP_DECRYPTION_KEY: "{{ key_path }}"
-    PGP_CERT_D: "{{ cert_d_path }}"
+    config_path: "{{ config_path }}"
   register: overwrite_result
 
 - name: Assert overwrite reports changed with a new secret
@@ -262,10 +268,7 @@
   famedly.base.openpgp_secretstore:
     password_store_path: "{{ store_path }}"
     password_slug: "test/sop_secret"
-  environment:
-    ANSIBLE_OPENPGP_SECRETSTORE_SOP_EXEC: "{{ rsop_path }}"
-    ANSIBLE_OPENPGP_SECRETSTORE_SOP_DECRYPTION_KEY: "{{ key_path }}"
-    PGP_CERT_D: "{{ cert_d_path }}"
+    config_path: "{{ config_path }}"
   register: after_overwrite_result
 
 - name: Assert idempotency after overwrite
@@ -295,10 +298,7 @@
     password_store_path: "{{ store_path }}"
     password_slug: "test/sop_secret"
     state: absent
-  environment:
-    ANSIBLE_OPENPGP_SECRETSTORE_SOP_EXEC: "{{ rsop_path }}"
-    ANSIBLE_OPENPGP_SECRETSTORE_SOP_DECRYPTION_KEY: "{{ key_path }}"
-    PGP_CERT_D: "{{ cert_d_path }}"
+    config_path: "{{ config_path }}"
   register: delete_result
 
 - name: Assert deletion reports changed
@@ -336,10 +336,7 @@
     password_store_path: "{{ store_path }}"
     password_slug: "test/sop_secret"
     state: absent
-  environment:
-    ANSIBLE_OPENPGP_SECRETSTORE_SOP_EXEC: "{{ rsop_path }}"
-    ANSIBLE_OPENPGP_SECRETSTORE_SOP_DECRYPTION_KEY: "{{ key_path }}"
-    PGP_CERT_D: "{{ cert_d_path }}"
+    config_path: "{{ config_path }}"
   register: delete_again_result
 
 - name: Assert second deletion is idempotent

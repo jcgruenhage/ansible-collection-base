@@ -88,6 +88,11 @@ options:
         description: When present, verify ciphertext recipients match .gpg-id and re-encrypt if not.
         type: bool
         default: true
+    config_path:
+        description: >
+            Path to a custom config file. When set, this file is used instead of the
+            platform-default config location. Useful for testing or isolated environments.
+        type: path
 """
 
 EXAMPLES = r"""
@@ -205,6 +210,7 @@ def _argument_spec() -> Dict[str, Any]:
         "secret_pattern": dict(type="str", default="([A-Za-z0-9])", no_log=False),
         "user_supplied_secret": dict(type="str", default=None, no_log=True),
         "check_recipients": dict(type="bool", default=True),
+        "config_path": dict(type="path", default=None),
     }
 
 
@@ -236,6 +242,9 @@ def main() -> None:
         store = SecretStore(
             password_store_path=Path(params["password_store_path"])
             if params.get("password_store_path")
+            else None,
+            config_path=Path(params["config_path"])
+            if params.get("config_path")
             else None,
             generate=SecretGenerator(
                 secret_type=params.get("secret_type", "random"),

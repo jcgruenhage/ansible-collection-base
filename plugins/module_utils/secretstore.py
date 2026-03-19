@@ -163,8 +163,9 @@ class SecretStore:
         self,
         password_store_path: Optional[Path] = None,
         generate: Optional[SecretGenerator] = None,
+        config_path: Optional[Path] = None,
     ):
-        config = load_secretstore_config(password_store_path=password_store_path)
+        config = load_secretstore_config(password_store_path=password_store_path, config_path=config_path)
         self._backend = build_backend(config)
         self.pgp_cert_d_path = config.pgp_cert_d_path
         self.password_store_path = config.password_store_path
