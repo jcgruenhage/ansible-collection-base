@@ -1,6 +1,8 @@
 ---
 sshd_secure_presets:
   allowed_kexalgos:
+    - mlkem768x25519-sha256
+    - sntrup761x25519-sha512
     - sntrup761x25519-sha512@openssh.com
     - sntrup4591761x25519-sha512@tinyssh.org
     - curve25519-sha256
