@@ -53,6 +53,7 @@ def run_sop(
     args: List[str],
     stdin: Optional[bytes] = None,
     env: Optional[Dict[str, str]] = None,
+    retries: int = 3,
 ) -> bytes:
     """Run sop (or rsoct etc.) subprocess. Single mock point for tests.
 
@@ -61,20 +62,24 @@ def run_sop(
         args: Command-line arguments (e.g. ["decrypt", "/path/to/key"]).
         stdin: Optional stdin bytes (e.g. ciphertext).
         env: Optional environment for the subprocess.
+        retries: Number of attempts before raising (default 3).
 
     Returns:
         stdout bytes.
     """
     cmd = [str(executable)] + args
-    result = subprocess.run(
-        cmd,
-        input=stdin,
-        capture_output=True,
-        check=False,
-        env=env,
-    )
-    if result.returncode != 0:
-        raise RuntimeError(
+    last_error: Optional[RuntimeError] = None
+    for _ in range(max(1, retries)):
+        result = subprocess.run(
+            cmd,
+            input=stdin,
+            capture_output=True,
+            check=False,
+            env=env,
+        )
+        if result.returncode == 0:
+            return result.stdout
+        last_error = RuntimeError(
             "%s failed (exit %s): %s"
             % (
                 str(executable),
@@ -82,4 +87,4 @@ def run_sop(
                 (result.stderr or b"").decode("utf-8", errors="replace"),
             )
         )
-    return result.stdout
+    raise last_error  # type: ignore[misc]
