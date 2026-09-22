@@ -11,8 +11,8 @@
   ansible.builtin.file:
     path: "{{ redis_basepath }}"
     state: "directory"
-    owner: "{{ redis_user }}"
-    group: "{{ redis_user }}"
+    owner: "root"
+    group: "root"
     mode: "0755"
   tags: ["prepare", "prepare-redis"]
 
